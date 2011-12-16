@@ -1,13 +1,22 @@
-#include <sys/time.h>
 #include <stdio.h>
+#include <iostream>
+#include <string>
 #include "Utility.h"
+#ifdef __APPLE__
+#include <CoreFoundation/CoreFoundation.h>
+#endif
 
-double getTime() {
-    struct timeval tv;
-    const int rc = gettimeofday(&tv, 0);
-    if (rc == -1) {
-        printf("ERROR: Bad call to gettimeofday\n");
-        return -1;
+std::string GetResourcePath(std::string filePath) {
+#ifdef __APPLE__
+    CFBundleRef mainBundle   = CFBundleGetMainBundle();
+    CFURLRef    resourcesURL = CFBundleCopyResourcesDirectoryURL(mainBundle);
+    char path[2048];
+    if (!CFURLGetFileSystemRepresentation(resourcesURL, true, (UInt8*)path, 2048)) {
+        std::cerr << "Could not find resources directory" << std::endl;
     }
-    return (double)tv.tv_sec + 1.0e-6 * (double)tv.tv_usec;
+    CFRelease(resourcesURL);
+    return std::string(path) +"/" + filePath;
+#else
+    return std::string("resources/") + filePath;
+#endif
 }

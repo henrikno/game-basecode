@@ -1,3 +1,3 @@
 #pragma once
 
-double getTime();
+std::string GetResourcePath(std::string path);
